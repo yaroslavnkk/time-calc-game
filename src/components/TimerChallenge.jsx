@@ -1,19 +1,34 @@
 import { useState, useRef } from 'react';
+import Result from './Result.jsx';
 export default function TimerChallenge({title, time}){
     let timer = useRef(0);
-    const[timerExpired, setTimerExpired] = useState(false);
-    const[timerStarted, setTimerStared] = useState(false);
+    let dialog = useRef(null);
+    const [timeRemaining, setTimeRemaining] = useState(time * 1000);
+    const timeIsActive = timeRemaining > 0 && timeRemaining < time * 1000;
+    if(timeRemaining <= 0){
+        clearTimeout(timer.current);
+        dialog.current.showModal();
+    }
     function handleButtonClick(){
-       timer.current = setTimeout(() => {setTimerExpired(true)}, time * 1000);
-        setTimerStared(true);
+       timer.current = setInterval(() => setTimeRemaining(prevTime => prevTime - 10), 10);
     }
     function handleStopChallenge(){
-        clearTimeout(timer.current);
+        dialog.current.showModal();
+        clearInterval(timer.current);
     }
-    return <section className='challenge'>
-        <h2>{title}</h2>
-        {timerExpired && <p>You lost!</p>}
-        <p>{time} second{time > 1 ? 's' : ''}</p>
-        <button onClick={timerStarted ? handleStopChallenge : handleButtonClick}>{timerStarted ? "Stop" : "Start"} Challenge</button>
-    </section>
+    function handleReset(){
+        setTimeRemaining(time * 1000);
+    }
+    return <>
+        <Result ref={dialog} time={time} timeRemaining={timeRemaining} onReset={handleReset} />
+        <section className='challenge'>
+            <h2>{title}</h2>
+            <p>{time} second{time > 1 ? 's' : ''}</p>
+            <button
+                onClick={timeIsActive ? handleStopChallenge : handleButtonClick}>
+                {timeIsActive ? "Stop" : "Start"} Challenge
+            </button>
+        </section>
+    </>
+
 }

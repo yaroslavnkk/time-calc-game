@@ -6,6 +6,7 @@ export default function Player() {
     setPlayerName(player.current.value);
   }
     return (
+
     <section id="player">
       <h2>Welcome, { playerName ?? 'Player'}!</h2>
       <p>
